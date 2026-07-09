@@ -1,50 +1,86 @@
-const tabs = document.querySelectorAll('.tab');
-const emailGroup = document.getElementById('emailGroup');
-const confirmGroup = document.getElementById('confirmGroup');
-const submitBtn = document.getElementById('submitBtn');
-const btnText = document.getElementById('btnText');
+// ======================
+// NAVIGATION
+// ======================
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    document.getElementById(pageId).classList.add('active');
 
-let currentMode = 'login';
-
-tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        currentMode = tab.dataset.mode;
-
-        if (currentMode === 'signup') {
-            emailGroup.style.display = 'block';
-            confirmGroup.style.display = 'block';
-            btnText.textContent = 'CREATE_ACCOUNT';
-            submitBtn.setAttribute('data-text', 'CREATE_ACCOUNT');
-        } else {
-            emailGroup.style.display = 'none';
-            confirmGroup.style.display = 'none';
-            btnText.textContent = 'INITIATE_CONNECTION';
-            submitBtn.setAttribute('data-text', 'INITIATE_CONNECTION');
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(`'${pageId}'`)) {
+            link.classList.add('active');
         }
     });
-});
+}
 
-// Form submission
-document.getElementById('authForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+// ======================
+// AUTHENTICATION + PLAY BUTTON
+// ======================
+let currentMode = 'login';
 
-    if (currentMode === 'login') {
-        alert(`🔐 LOGIN ATTEMPT\nUsername: ${username}\nAccess Key: ${password}`);
-    } else {
-        const email = document.getElementById('email').value;
-        const confirm = document.getElementById('confirmPassword').value;
+document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.tab');
+    const emailGroup = document.getElementById('emailGroup');
+    const confirmGroup = document.getElementById('confirmGroup');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const authForm = document.getElementById('authForm');
+    const successScreen = document.getElementById('successScreen');
 
-        if (password !== confirm) {
-            alert("❌ ACCESS_KEYS DO NOT MATCH");
-            return;
-        }
+    if (!tabs.length) return;
 
-        alert(`✅ ACCOUNT CREATED\nUsername: ${username}\nEmail: ${email}`);
+    // Tab switching
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            currentMode = tab.dataset.mode;
+
+            if (currentMode === 'signup') {
+                emailGroup.style.display = 'block';
+                confirmGroup.style.display = 'block';
+                btnText.textContent = 'CREATE_ACCOUNT';
+                submitBtn.setAttribute('data-text', 'CREATE_ACCOUNT');
+            } else {
+                emailGroup.style.display = 'none';
+                confirmGroup.style.display = 'none';
+                btnText.textContent = 'INITIATE_CONNECTION';
+                submitBtn.setAttribute('data-text', 'INITIATE_CONNECTION');
+            }
+        });
+    });
+
+    // Form submission
+    if (authForm) {
+        authForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!username || !password) {
+                alert("⚠️ ACCESS DENIED: Missing credentials");
+                return;
+            }
+
+            // Success → Show PLAY Button
+            authForm.style.display = 'none';
+            successScreen.style.display = 'flex';
+
+            if (currentMode === 'login') {
+                document.getElementById('successTitle').textContent = "CONNECTION ESTABLISHED";
+            } else {
+                document.getElementById('successTitle').textContent = "ACCOUNT CREATED";
+            }
+        });
     }
 });
+
+// Go back to auth form (optional)
+function resetAuth() {
+    document.getElementById('authForm').style.display = 'block';
+    document.getElementById('successScreen').style.display = 'none';
+}
