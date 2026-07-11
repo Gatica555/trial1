@@ -44,7 +44,7 @@ function enterSystem() {
     showPage('game');
     gameActive = true;
     score = 0;
-    document.getElementById('score').textContent = 'SCORE: 0000';
+    document.getElementById('score').textContent = 'SCORE: 999999999999';
     startMatrixGame();
 }
 
